@@ -29,7 +29,8 @@
       flex-wrap: wrap;
       justify-content: center;
     }
-        .toggles {
+
+    .toggles {
       display: flex;
       width: auto;
       gap: 1rem;
@@ -529,28 +530,28 @@
       <option value="bomber.webp">Bomber Jet</option>
       <option value="stealth.webp">Stealth Jet</option>
     </select>
-<div class="toggles">
-    <!-- 🆕 Voice Commands Toggle -->
-    <div class="voice-toggle-label">
-      <label class="voice-toggle" for="voice-toggle">
-        <input type="checkbox" id="voice-toggle" />
-        <span class="voice-slider"></span>
-      </label>
-      Voice Commands
-    </div>
+    <div class="toggles">
+      <!-- 🆕 Voice Commands Toggle -->
+      <div class="voice-toggle-label">
+        <label class="voice-toggle" for="voice-toggle">
+          <input type="checkbox" id="voice-toggle" />
+          <span class="voice-slider"></span>
+        </label>
+        Voice Commands
+      </div>
 
-    <!-- 🆕 TTS Toggle -->
-    <div class="tts-toggle-label">
-      <label class="tts-toggle" for="tts-toggle">
-        <input type="checkbox" id="tts-toggle" checked />
-        <span class="tts-slider"></span>
-      </label>
-      TTS Callouts
+      <!-- 🆕 TTS Toggle -->
+      <div class="tts-toggle-label">
+        <label class="tts-toggle" for="tts-toggle">
+          <input type="checkbox" id="tts-toggle" checked />
+          <span class="tts-slider"></span>
+        </label>
+        TTS Callouts
+      </div>
+      <!-- Info Button -->
+      <button class="info-btn" onclick="openInfoModal()">ℹ️</button>
     </div>
-    <!-- Info Button -->
-    <button class="info-btn" onclick="openInfoModal()">ℹ️</button>
   </div>
-</div>
   <div class="cards" id="cards"></div>
   <button class="clear-btn" id="clear-btn" onclick="clearAllCards()" style="display: none;">Clear All</button>
   <!-- Info Modal -->
@@ -559,7 +560,7 @@
       <button class="modal-close" onclick="closeInfoModal()">✕</button>
       <h2>How to use</h2>
       <p>Select a preset (map and mode) or add cards manually, kill stuff, set timers, never get backstabbed again.</p>
-      
+
       <h3>Tips</h3>
       <ul>
         <li>Voice commands are optional, you can use the buttons if you prefer.</li>
@@ -601,6 +602,7 @@
     </div>
   </div>
   <script>
+
     // ----------------------------
     // State
     // ----------------------------
@@ -1208,9 +1210,11 @@
       if (voiceEnabled && !listening) {
         recognition.start();
         listening = true;
+        updateCardLabelsVisibility();
       } else if (!voiceEnabled && listening) {
         recognition.stop();
         listening = false;
+        updateCardLabelsVisibility();
       }
     }
 
@@ -1276,7 +1280,7 @@
 
     function addCard(image, name, locked = false) {
       cardId += 1;
-
+      
       const cardHtml = `
         <div class="card ${locked ? 'locked' : ''}" id="card-${cardId}" data-vehicle="${name}">
           <div class="card-image-container">
@@ -1312,6 +1316,7 @@
       $('#cards').insertAdjacentHTML('beforeend', cardHtml);
 
       setupCard($(`#card-${cardId}`));
+      updateCardLabelsVisibility();
       updateClearButton();
     }
 
@@ -1460,6 +1465,7 @@
     $('#voice-toggle').addEventListener('change', function () {
       voiceEnabled = this.checked;
       toggleVoiceRecognition();
+      updateCardLabelsVisibility(); // 🔹 show/hide labels when toggle changes
     });
 
     function openInfoModal() {
@@ -1478,6 +1484,13 @@
         document.getElementById('info-modal').style.display = 'none';
       }
     });
+
+    function updateCardLabelsVisibility() {
+      const show = voiceEnabled; // show labels if voice toggle is enabled
+      $$('.card .card-label').forEach(label => {
+        label.style.display = show ? 'block' : 'none';
+      });
+    }
   </script>
 
 </body>
