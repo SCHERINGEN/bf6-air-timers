@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>BF6 Air Tracker</title>
+
+  <style>
+    /* Your existing CSS + enhanced toggles */
+    * {
+      box-sizing: border-box;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    body {
+      margin: 0;
+      padding: 1.5rem;
+      background: #201e1e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .controls {
+      display: flex;
+      width: 100%;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .add-btn,
+    .clear-btn {
+      padding: 1rem 2rem;
+      height: 64px;
+      border: none;
+      border-radius: 8px;
+      background: #393b3f;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .clear-btn {
+      background: none;
+    }
+
+    /* 🎤 TTS Toggle Switch */
+    .tts-toggle {
+      position: relative;
+      display: inline-block;
+      width: 74px;
+      height: 36px;
+    }
+
+    .tts-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .tts-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #393b3f;
+      transition: 0.3s;
+      border-radius: 18px;
+    }
+
+    .tts-slider:before {
+      position: absolute;
+      content: "";
+      height: 28px;
+      width: 28px;
+      left: 4px;
+      bottom: 4px;
+      background: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    .tts-toggle input:checked+.tts-slider {
+      background: #22c55e;
+    }
+
+    .tts-toggle input:checked+.tts-slider:before {
+      transform: translateX(38px);
+    }
+
+    .tts-toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* 🔊 Voice Commands Toggle Switch */
+    .voice-toggle {
+      position: relative;
+      display: inline-block;
+      width: 74px;
+      height: 36px;
+    }
+
+    .voice-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .voice-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #393b3f;
+      transition: 0.3s;
+      border-radius: 18px;
+    }
+
+    .voice-slider:before {
+      position: absolute;
+      content: "";
+      height: 28px;
+      width: 28px;
+      left: 4px;
+      bottom: 4px;
+      background: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    .voice-toggle input:checked+.voice-slider {
+      background: #3b82f6;
+    }
+
+    .voice-toggle input:checked+.voice-slider:before {
+      transform: translateX(38px);
+    }
+
+    .voice-toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* Rest of your existing CSS unchanged */
+    .cards {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      max-width: 640px;
+      height: 360px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, .12);
+      overflow: hidden;
+      position: relative;
+      flex: 1 1 calc(25%);
+    }
+
+    .card-image-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .card-image-container.dead::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 2;
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-holder {
+      position: absolute;
+      top: 0px;
+      left: -24px;
+      z-index: 9;
+      pointer-events: none;
+      padding: 4px 32px 8px 32px;
+      backdrop-filter: blur(5px) saturate(100%);
+      -webkit-backdrop-filter: blur(5px) saturate(100%);
+
+      mask-image: radial-gradient(circle,
+          black 70%,
+          transparent 100%);
+
+      -webkit-mask-image: radial-gradient(circle,
+          black 70%,
+          transparent 100%);
+    }
+
+
+    .card-label {
+      color: white;
+      font-weight: 400;
+      font-size: 1rem;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+      font-style: italic;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: #393b3f;
+      color: white;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
+    }
+
+    .kill-btn {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      height: 64px;
+      border: none;
+      background: #393b3f;
+      color: white;
+      font-size: 1.3rem;
+      cursor: pointer;
+      z-index: 5;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .kill-btn:hover {
+      background: #550000;
+    }
+
+    .timer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 600;
+      color: white;
+      text-shadow: 1px 0 10px black;
+      z-index: 5;
+      display: none;
+      font-size: clamp(1rem, 6vw, 6rem);
+    }
+
+    .timer.warning {
+      color: #eab308;
+    }
+
+    .timer.danger {
+      color: #dc2626;
+    }
+
+    .timer-controls {
+      position: absolute;
+      top: calc(50% + 5rem);
+      left: 50%;
+      transform: translateX(-50%);
+      gap: 1.5rem;
+      z-index: 6;
+      display: none;
+    }
+
+    .time-btn {
+      min-width: 72px;
+      min-height: 56px;
+      padding: 0.6rem 1rem;
+      font-size: 1.4rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      background: #393b3f;
+      color: white;
+      cursor: pointer;
+    }
+
+    .time-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .selectField {
+      appearance: none;
+      padding: 20px;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23FFFFFF' viewBox='0 0 20 20'><path d='M7 10l5 5 5-5z'/><path fill='none' d='M0 0h24v24H0z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 20px center;
+      background-size: 20px;
+      padding-right: 60px;
+    }
+
+    @keyframes pulseTwice {
+      0% {
+        transform: scale(1);
+      }
+
+      25% {
+        transform: scale(1.04);
+      }
+
+      50% {
+        transform: scale(1);
+      }
+
+      75% {
+        transform: scale(1.04);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .card.pulse {
+      animation: pulseTwice 0.6s ease-in-out;
+    }
+
+    .card.locked .card-image-container::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 2;
+    }
+
+    .card.locked .kill-btn {
+      background: #393b3f;
+      cursor: pointer;
+    }
+
+    .card.locked .kill-btn:hover {
+      background: #1f7a1f;
+    }
+
+    /* =========================================================
+   Info Button
+========================================================= */
+    .info-btn {
+      height: 64px;
+      width: 64px;
+      border-radius: 50%;
+      border: none;
+      background: none;
+      color: white;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .info-btn:hover {
+      background: #4b5563;
+    }
+
+    /* =========================================================
+   Modal
+========================================================= */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal {
+      position: relative;
+      background: rgba(32, 30, 30, 0.85);
+      backdrop-filter: blur(10px) saturate(120%);
+      color: white;
+      border-radius: 12px;
+      max-width: 520px;
+      width: 90%;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .modal-content {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .modal-content ul {
+      margin-top: 0.25rem;
+      margin-bottom: 1rem;
+      padding-left: 1.25rem;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: #dc2626;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="controls">
+    <select class="add-btn selectField" id="map-select" onchange="updatePreset()">
+      <option value="">Select Map</option>
+      <option value="blackwell">Blackwell Fields</option>
+      <option value="contaminated">Contaminated</option>
+      <option value="eastwood">Eastwood</option>
+      <option value="liberation">Liberation Peak</option>
+      <option value="manhattan">Manhattan Bridge</option>
+      <option value="mirak">Mirak Valley</option>
+      <option value="newsobek">New Sobek City</option>
+      <option value="firestorm">Operation Firestorm</option>
+    </select>
+
+    <select class="add-btn selectField" id="mode-select" onchange="updatePreset()">
+      <option value="">Select Mode</option>
+      <option value="conquest">Conquest</option>
+      <option value="escalation">Escalation</option>
+    </select>
+
+    <select class="add-btn selectField" id="add-select" onchange="addSelectedCard()">
+      <option value="">Add Vehicle</option>
+      <option value="littlebird.webp">Scout Helicopter</option>
+      <option value="attack.webp">Attack Helicopter</option>
+      <option value="transport.webp">Transport Helicopter</option>
+      <option value="bomber.webp">Bomber Jet</option>
+      <option value="stealth.webp">Stealth Jet</option>
+    </select>
+
+    <!-- 🆕 Voice Commands Toggle -->
+    <div class="voice-toggle-label">
+      <label class="voice-toggle" for="voice-toggle">
+        <input type="checkbox" id="voice-toggle" />
+        <span class="voice-slider"></span>
+      </label>
+      Voice Commands
+    </div>
+
+    <!-- 🆕 TTS Toggle -->
+    <div class="tts-toggle-label">
+      <label class="tts-toggle" for="tts-toggle">
+        <input type="checkbox" id="tts-toggle" checked />
+        <span class="tts-slider"></span>
+      </label>
+      TTS Callouts
+    </div>
+    <!-- Info Button -->
+    <button class="info-btn" onclick="openInfoModal()">ℹ️</button>
+  </div>
+
+  <div class="cards" id="cards"></div>
+  <button class="clear-btn" id="clear-btn" onclick="clearAllCards()" style="display: none;">Clear All</button>
+  <!-- Info Modal -->
+  <div class="modal-overlay" id="info-modal" onclick="closeInfoModal(event)">
+    <div class="modal">
+      <button class="modal-close" onclick="closeInfoModal()">✕</button>
+      <h2>How to use</h2>
+      <p>Select a preset (map and mode) or add cards manually, kill stuff, set timers, never get backstabbed again.</p>
+      <br />
+      <h3>Tips</h3>
+      <ul>
+        <li>Voice commands are optional, you can use the buttons if you prefer.</li>
+        <li>TTS will only call out when timers run out and to confirm when executing voice commands.</li>
+      </ul>
+
+
+      <div class="modal-content">
+
+        <h3>Voice Commands 🎤</h3>
+        <p><strong>Start Timers</strong></p>
+        <ul>
+          <li>Say "Timer" and the vehicle alias</li>
+          <li>"Timer Scout" - will start the timer a scout card</li>
+        </ul>
+
+        <p><strong>Activate locked Escalation Cards</strong></p>
+        <ul>
+          <li>Say "Activate" and the vehicle alias</li>
+          <li>"Activate Scout" - will activate a locked scout card</li>
+        </ul>
+        <p><strong>Add Cards</strong></p>
+        <ul>
+          <li>Say "Add" and the vehicle alias</li>
+          <li>"Add Scout" - will add a scout card</li>
+        </ul>
+        <p><strong>Remove Cards</strong></p>
+        <ul>
+          <li>Say "Remove" and the vehicle alias</li>
+          <li>"Remove Scout" - will Remove a scout card</li>
+        </ul>
+        <p><strong>Replace Cards</strong></p>
+        <ul>
+          <li>Say "Replace" and the vehicle alias of the card to replace, then vehicle alias to replace with</li>
+          <li>"Replace Scout Attack" - will replace a Scout card with an Attack card</li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
+  <script>
+    // ----------------------------
+    // State
+    // ----------------------------
+    let cardId = 0;
+    let ttsEnabled = true;
+    let voiceEnabled = false;
+
+    let voices = [];
+    let femaleVoice = null;
+
+    let recognition = null;
+    let listening = false;
+
+    // ----------------------------
+    // Constants / Config
+    // ----------------------------
+    const TIMER_DEFAULT_SECONDS = 90;
+    const TIMER_MIN_SECONDS = 0;
+    const TIMER_MAX_SECONDS = 120;
+    const TIMER_STEP_SECONDS = 5;
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => root.querySelectorAll(selector);
+
+    const PRESETS = {
+      blackwell: {
+        conquest: [
+          { img: 'attack.webp', unlocked: true },
+          { img: 'bomber.webp', unlocked: true },
+          { img: 'stealth.webp', unlocked: true }
+        ],
+        escalation: []
+      },
+
+      contaminated: {
+        conquest: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'attack.webp', unlocked: true }
+        ],
+        escalation: [
+          { img: 'littlebird.webp', unlocked: true },  // starts active
+          { img: 'attack.webp', unlocked: false },     // starts locked
+          { img: 'littlebird.webp', unlocked: false }
+        ]
+      },
+
+      eastwood: {
+        conquest: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'transport.webp', unlocked: true }
+        ],
+        escalation: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'transport.webp', unlocked: false },
+          { img: 'attack.webp', unlocked: false }
+        ]
+      },
+
+      firestorm: {
+        conquest: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'attack.webp', unlocked: true },
+          { img: 'transport.webp', unlocked: true },
+          { img: 'bomber.webp', unlocked: true },
+          { img: 'stealth.webp', unlocked: true }
+        ],
+        escalation: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'transport.webp', unlocked: true },
+          { img: 'attack.webp', unlocked: false },
+          { img: 'attack.webp', unlocked: false },
+          { img: 'bomber.webp', unlocked: false },
+          { img: 'stealth.webp', unlocked: false },
+          { img: 'bomber.webp', unlocked: false },
+          { img: 'stealth.webp', unlocked: false }
+        ]
+      },
+
+      liberation: {
+        conquest: [
+          { img: 'attack.webp', unlocked: true },
+          { img: 'bomber.webp', unlocked: true },
+          { img: 'stealth.webp', unlocked: true }
+        ],
+        escalation: [
+          { img: 'attack.webp', unlocked: false },
+          { img: 'bomber.webp', unlocked: false },
+          { img: 'stealth.webp', unlocked: false }
+        ]
+      },
+
+      manhattan: {
+        conquest: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'attack.webp', unlocked: true }
+        ],
+        escalation: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'attack.webp', unlocked: false }
+        ]
+      },
+
+      mirak: {
+        conquest: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'attack.webp', unlocked: true },
+          { img: 'bomber.webp', unlocked: true },
+          { img: 'stealth.webp', unlocked: true }
+        ],
+        escalation: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'transport.webp', unlocked: true },
+          { img: 'attack.webp', unlocked: false },
+          { img: 'bomber.webp', unlocked: false },
+          { img: 'stealth.webp', unlocked: false },
+          { img: 'transport.webp', unlocked: false },
+          { img: 'bomber.webp', unlocked: false },
+          { img: 'stealth.webp', unlocked: false },
+          { img: 'attack.webp', unlocked: false }
+        ]
+      },
+
+      newsobek: {
+        conquest: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'transport.webp', unlocked: true }
+        ],
+        escalation: [
+          { img: 'littlebird.webp', unlocked: true },
+          { img: 'transport.webp', unlocked: false }
+        ]
+      }
+    };
+    // Not used for voice commands
+    const VEHICLE_NAME_BY_KEYWORD = [
+      { key: 'littlebird', name: 'Scout' },
+      { key: 'attack', name: 'Attack' },
+      { key: 'transport', name: 'Transport' },
+      { key: 'bomber', name: 'Bomber' },
+      { key: 'stealth', name: 'Stealth' }
+    ];
+
+    // Used for voice commands
+    const VOICE_TIMER_KEYWORDS = [
+      "time", "prim", "camera", "thai", "i'm", "diam", "trying", "priv",
+      "climate", "pine", "tire", "tiger", "tyler", "pilot", "find", "panel", "try"
+    ];
+
+    const VOICE_ACTIVATE_KEYWORDS = [
+      "activ",
+    ];
+
+    // NEW: remove intent keywords (keep a few common ASR near-misses)
+    const VOICE_REMOVE_KEYWORDS = [
+      "remove",
+    ];
+
+    // NEW: add/replace voice intents
+    const VOICE_ADD_KEYWORDS = [
+      "add",
+    ];
+
+    const VOICE_REPLACE_KEYWORDS = [
+      "replace",
+    ];
+
+
+    const VOICE_GROUPS = [
+      { keywords: ["scout", "count", "scalp", "scale", "gout"], command: "littlebird.webp", name: "Scout" },
+      { keywords: ["attack", "talk", "tech"], command: "attack.webp", name: "Attack" },
+      { keywords: ["trans", "port", "spot"], command: "transport.webp", name: "Transport" },
+      { keywords: ["bomb", "pump", "bumper"], command: "bomber.webp", name: "Bomber" },
+      { keywords: ["stealth", "stop", "self", "stove", "estelle", "status"], command: "stealth.webp", name: "Stealth" }
+    ];
+
+    // ----------------------------
+    // Helpers
+    // ----------------------------
+    function getVehicleName(filename) {
+      const lower = String(filename).toLowerCase();
+      for (const { key, name } of VEHICLE_NAME_BY_KEYWORD) {
+        if (lower.includes(key)) return name;
+      }
+      return "Vehicle";
+    }
+
+    function formatMMSS(totalSeconds) {
+      const mm = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const ss = String(totalSeconds % 60).padStart(2, '0');
+      return `${mm}:${ss}`;
+    }
+
+    function getTranscript(event) {
+      return event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+    }
+
+    function isTimerInactive(timerEl) {
+      const display = timerEl?.style?.display;
+      return display === "none" || display === "" || display == null;
+    }
+
+    function findFirstAvailableCardByFilename(filename) {
+      const cards = $$('.card');
+      const needle = filename.toLowerCase();
+
+      for (const card of cards) {
+        const img = $('img', card);
+        const killBtn = $('.kill-btn', card);
+        const timer = $('.timer', card);
+        if (!img || !killBtn || !timer) continue;
+
+        const src = img.src.toLowerCase();
+        const isMatch = src.endsWith(needle) || src.includes("/" + needle);
+        const inactive = isTimerInactive(timer);
+
+        if (isMatch && inactive && !card.classList.contains('locked')) {
+          return { card, killBtn };
+        }
+      }
+
+      return null;
+    }
+
+    // NEW: find first removable card by vehicle name (not on timer)
+    function findFirstRemovableCardByName(vehicleName) {
+      const wanted = String(vehicleName).toLowerCase();
+      const cards = $$('.card');
+
+      for (const card of cards) {
+        const name = String(card.dataset.vehicle || '').toLowerCase();
+        if (name !== wanted) continue;
+
+        const timer = $('.timer', card);
+        if (!timer || !isTimerInactive(timer)) continue;
+
+        return card;
+      }
+
+      return null;
+    }
+
+
+    // ----------------------------
+    // Voice command parsing helpers
+    // ----------------------------
+    function getVehicleGroupByName(vehicleName) {
+      const wanted = String(vehicleName || '').toLowerCase();
+      return VOICE_GROUPS.find(g => String(g.name).toLowerCase() === wanted) || null;
+    }
+
+    // Returns matched VOICE_GROUPS sorted by first occurrence in transcript
+    function getGroupsInTranscriptOrder(transcript) {
+      const t = String(transcript || '').toLowerCase();
+      const hits = [];
+
+      for (const group of VOICE_GROUPS) {
+        let bestIndex = Infinity;
+        for (const kw of group.keywords) {
+          const idx = t.indexOf(kw);
+          if (idx !== -1) bestIndex = Math.min(bestIndex, idx);
+        }
+        if (bestIndex !== Infinity) hits.push({ group, index: bestIndex });
+      }
+
+      hits.sort((a, b) => a.index - b.index);
+      // Remove duplicates by vehicle name (keep earliest)
+      const seen = new Set();
+      const ordered = [];
+      for (const h of hits) {
+        const key = String(h.group.name).toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        ordered.push(h.group);
+      }
+      return ordered;
+    }
+
+    function addCardByName(vehicleName) {
+      const group = getVehicleGroupByName(vehicleName);
+      if (!group) {
+        console.log("Unknown vehicle for add:", vehicleName);
+        return false;
+      }
+      addCard(`./${group.command}`, group.name, false);
+      speak(`${group.name} added`);
+      console.log(`Added ${group.name}`);
+      return true;
+    }
+
+    // Replace first removable card of "fromName" with a new card of "toName"
+    function replaceCardByNames(fromName, toName) {
+      const fromGroup = getVehicleGroupByName(fromName);
+      const toGroup = getVehicleGroupByName(toName);
+
+      if (!fromGroup || !toGroup) {
+        console.log("Unknown vehicles for replace:", fromName, toName);
+        return false;
+      }
+
+      // Allow replacing locked or unlocked cards, but never one on an active timer
+      const oldCard = (function () {
+        const wanted = String(fromGroup.name).toLowerCase();
+        const cards = $$('.card');
+        for (const card of cards) {
+          const name = String(card.dataset.vehicle || '').toLowerCase();
+          if (name !== wanted) continue;
+
+          const timer = $('.timer', card);
+          if (!timer || !isTimerInactive(timer)) continue;
+          return card;
+        }
+        return null;
+      })();
+
+      if (!oldCard) {
+        console.log(`No replaceable ${fromGroup.name} card found`);
+        return false;
+      }
+
+      // Insert a new card in the same position, then remove the old one
+      cardId += 1;
+      const newId = `card-${cardId}`;
+      const cardHtml = `
+        <div class="card" id="${newId}" data-vehicle="${toGroup.name}">
+          <div class="card-image-container">
+            <div class="card-holder">
+              <div class="card-label">🕑 "Timer ${toGroup.name}"</div>
+              <div class="card-label">🗑️ "Remove ${toGroup.name}"</div>
+            </div>
+            <button class="delete-btn" onclick="removeCard('${newId}')">🗑️</button>
+            <img src="./${toGroup.command}">
+            <button class="kill-btn">Unalive</button>
+            <div class="timer"></div>
+            <div class="timer-controls">
+              <button class="time-btn minus">-5</button>
+              <button class="time-btn plus">+5</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      oldCard.insertAdjacentHTML('beforebegin', cardHtml);
+      setupCard($(`#${newId}`));
+
+      // Remove old card (clears any interval)
+      removeCard(oldCard.id);
+
+      speak(`${fromGroup.name} replaced with ${toGroup.name}`);
+      console.log(`Replaced ${fromGroup.name} -> ${toGroup.name}`);
+      return true;
+    }
+
+
+    // ----------------------------
+    // TTS
+    // ----------------------------
+    function initVoices() {
+      voices = speechSynthesis.getVoices();
+      femaleVoice =
+        voices.find(v => {
+          const name = v.name || '';
+          const lower = name.toLowerCase();
+          return (
+            lower.includes('female') ||
+            lower.includes('woman') ||
+            name.includes('Samantha') ||
+            name.includes('Zira') ||
+            name.includes('Google US')
+          );
+        }) ||
+        voices.find(v => String(v.lang || '').startsWith('en-')) ||
+        voices[0] ||
+        null;
+    }
+
+    function speak(text) {
+      if (!ttsEnabled) return;
+
+      if (voices.length === 0) {
+        // Ensure voices are populated on some browsers
+        speechSynthesis.getVoices();
+        initVoices();
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.volume = 0.8;
+      utterance.rate = 1.2;
+      utterance.pitch = 1.1;
+      utterance.voice = femaleVoice;
+
+      speechSynthesis.speak(utterance);
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = initVoices;
+    }
+
+    // ----------------------------
+    // Voice Recognition
+    // ----------------------------
+    function toggleVoiceRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return;
+
+      if (!recognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+          if (!voiceEnabled) return;
+
+          const transcript = getTranscript(event);
+          console.log("Heard:", transcript);
+
+          // ----------------------------
+          // NEW: "Add {vehicle}"
+          // Example: "Add Scout"
+          // ----------------------------
+          if (VOICE_ADD_KEYWORDS.some(k => transcript.startsWith(k + " "))) {
+            const groups = getGroupsInTranscriptOrder(transcript);
+            if (groups.length >= 1) {
+              addCardByName(groups[0].name);
+            } else {
+              console.log("Add command heard, but no vehicle matched.");
+            }
+            return;
+          }
+
+          // ----------------------------
+          // NEW: "Replace {vehicle} {vehicle}"
+          // Example: "Replace Scout Attack"
+          // ----------------------------
+          if (VOICE_REPLACE_KEYWORDS.some(k => transcript.startsWith(k + " "))) {
+            const groups = getGroupsInTranscriptOrder(transcript);
+            if (groups.length >= 2) {
+              replaceCardByNames(groups[0].name, groups[1].name);
+            } else {
+              console.log("Replace command heard, but could not match two vehicles.");
+            }
+            return;
+          }
+
+          // Existing intents
+          const hasTimerIntent = VOICE_TIMER_KEYWORDS.some(k => transcript.includes(k));
+          const hasActivateIntent = VOICE_ACTIVATE_KEYWORDS.some(k => transcript.includes(k));
+          const hasRemoveIntent = VOICE_REMOVE_KEYWORDS.some(k => transcript.includes(k));
+
+          for (const group of VOICE_GROUPS) {
+            if (!group.keywords.some(k => transcript.includes(k))) continue;
+
+            // 🗑️ REMOVE (delete card)
+            if (hasRemoveIntent) {
+              removeCardByName(group.name);
+              return;
+            }
+
+            // 🔓 ACTIVATE (unlock)
+            if (hasActivateIntent) {
+              unlockCardByName(group.name);
+              return;
+            }
+
+            // ⏱️ TIMER (start timer)
+            if (hasTimerIntent) {
+              handleVoiceCommand(group.command, group.name);
+              return;
+            }
+          }
+        };
+
+        recognition.onend = () => {
+          if (voiceEnabled && listening) recognition.start();
+        };
+      }
+
+      if (voiceEnabled && !listening) {
+        recognition.start();
+        listening = true;
+      } else if (!voiceEnabled && listening) {
+        recognition.stop();
+        listening = false;
+      }
+    }
+
+    function handleVoiceCommand(filename, vehicleName) {
+      if (!voiceEnabled) return;
+
+      console.log("Close enough, unaliving:", filename.substring(0, filename.lastIndexOf('.')));
+
+      const hit = findFirstAvailableCardByFilename(filename);
+      if (hit) {
+        speak(`Timer started for ${vehicleName}`);
+        hit.killBtn.click();
+        return;
+      }
+
+      console.log("No available", filename, "card to unalive.");
+    }
+
+    // NEW: remove first available card by name (not on timer)
+    function removeCardByName(vehicleName) {
+      if (!voiceEnabled) return;
+
+      const card = findFirstRemovableCardByName(vehicleName);
+      if (!card) {
+        console.log(`No removable ${vehicleName} card found`);
+        return;
+      }
+
+      // Use existing delete behavior (same function the delete button uses)
+      removeCard(card.id);
+      speak(`${vehicleName} removed`);
+      console.log(`Removing ${vehicleName}`);
+    }
+
+    // ----------------------------
+    // UI / Cards
+    // ----------------------------
+    function updatePreset() {
+      const map = $('#map-select').value;
+      const mode = $('#mode-select').value;
+      if (!map || !mode) return;
+
+      clearAllCards();
+
+      const items = PRESETS[map]?.[mode] || [];
+      for (const item of items) {
+        const image = `./${item.img}`;
+        const isLocked = !item.unlocked; // locked if not unlocked
+        addCard(image, getVehicleName(item.img), isLocked);
+      }
+
+      updateClearButton();
+    }
+
+    function addSelectedCard() {
+      const select = $('#add-select');
+      const value = select.value;
+      if (!value) return;
+
+      addCard(`./${value}`, getVehicleName(value));
+      select.value = "";
+    }
+
+    function addCard(image, name, locked = false) {
+      cardId += 1;
+
+      const cardHtml = `
+        <div class="card ${locked ? 'locked' : ''}" id="card-${cardId}" data-vehicle="${name}">
+          <div class="card-image-container">
+            <div class="card-holder">
+              <div class="card-label">${locked ? '🔒 "Activate ' + name + '"' : '🕑 "Timer ' + name + '"'}</div>
+              <div class="card-label">${'🗑️ "Remove ' + name + '"'}</div>
+            </div>
+            <button class="delete-btn" onclick="removeCard('card-${cardId}')">🗑️</button>
+            <img src="${image}">
+            <button class="kill-btn">${locked ? 'Activate' : 'Unalive'}</button>
+            <div class="timer"></div>
+            <div class="timer-controls">
+              <button class="time-btn minus">-5</button>
+              <button class="time-btn plus">+5</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      $('#cards').insertAdjacentHTML('beforeend', cardHtml);
+
+      setupCard($(`#card-${cardId}`));
+      updateClearButton();
+    }
+
+    function setupCard(card) {
+      const vehicleName = card.dataset.vehicle;
+
+      const killBtn = $('.kill-btn', card);
+      const timer = $('.timer', card);
+      const controls = $('.timer-controls', card);
+      const imgWrap = $('.card-image-container', card);
+
+      const minus = $('.minus', card);
+      const plus = $('.plus', card);
+
+      killBtn.onclick = () => {
+        const label = $('.card-label', card);
+
+        if (card.classList.contains('locked')) {
+          card.classList.remove('locked');
+          imgWrap.classList.remove('dead');
+          killBtn.textContent = 'Unalive';
+          if (label) label.textContent = `🎤 Timer ${vehicleName}`;
+          return;
+        }
+
+        startTimer(TIMER_DEFAULT_SECONDS, vehicleName, card, killBtn, timer, controls, imgWrap, minus, plus);
+      };
+    }
+
+    function startTimer(seconds, vehicleName, card, killBtn, timer, controls, imgWrap, minus, plus) {
+      let remaining = seconds;
+
+      killBtn.style.display = 'none';
+      timer.style.display = 'block';
+      controls.style.display = 'flex';
+      imgWrap.classList.add('dead');
+
+      const update = () => {
+        timer.textContent = formatMMSS(remaining);
+
+        timer.classList.remove('warning', 'danger');
+        if (remaining <= 15) timer.classList.add('danger');
+        else if (remaining <= 30) timer.classList.add('warning');
+
+        minus.disabled = remaining <= TIMER_STEP_SECONDS;
+      };
+
+      minus.onclick = () => {
+        if (remaining > TIMER_STEP_SECONDS) {
+          remaining = Math.max(TIMER_MIN_SECONDS, remaining - TIMER_STEP_SECONDS);
+          update();
+        }
+      };
+
+      plus.onclick = () => {
+        remaining = Math.min(TIMER_MAX_SECONDS, remaining + TIMER_STEP_SECONDS);
+        update();
+      };
+
+      update();
+
+      const interval = setInterval(() => {
+        remaining -= 1;
+
+        if (remaining < 0) {
+          clearInterval(interval);
+          card.removeAttribute('data-interval');
+
+          timer.style.display = 'none';
+          controls.style.display = 'none';
+          killBtn.style.display = 'block';
+          imgWrap.classList.remove('dead');
+
+          card.classList.add('pulse');
+          speak(`Enemy ${vehicleName} spawned`);
+          setTimeout(() => card.classList.remove('pulse'), 700);
+          return;
+        }
+
+        update();
+      }, 1000);
+
+      // store interval
+      card.dataset.interval = interval;
+    }
+
+    function removeCard(id) {
+      const card = document.getElementById(id);
+      if (card?.dataset.interval) clearInterval(card.dataset.interval);
+      card?.remove();
+      updateClearButton();
+    }
+
+    function clearAllCards() {
+      // Cancel all queued TTS
+      speechSynthesis.cancel();
+
+      // Stop all running timers
+      $$('.card').forEach(card => {
+        const intervalId = card.dataset.interval;
+        if (intervalId) clearInterval(intervalId);
+      });
+
+      // Remove all cards
+      $('#cards').innerHTML = '';
+      updateClearButton();
+    }
+
+    function updateClearButton() {
+      const clearBtn = $('#clear-btn');
+      const hasCards = $('.card');
+      clearBtn.style.display = hasCards ? 'block' : 'none';
+    }
+
+    function unlockCardByName(vehicleName) {
+      const cards = $$('.card.locked');
+      const wanted = vehicleName.toLowerCase();
+
+      for (const card of cards) {
+        if (card.dataset.vehicle.toLowerCase() !== wanted) continue;
+
+        const killBtn = $('.kill-btn', card);
+        const imgWrap = $('.card-image-container', card);
+        const label = $('.card-label', card);
+
+        card.classList.remove('locked');
+        killBtn.textContent = 'Unalive';
+        imgWrap.classList.remove('dead');
+        if (label) label.textContent = `🎤 Timer ${vehicleName}`;
+
+        speak(`${vehicleName} activated`);
+        console.log(`Activating ${vehicleName}`);
+        return; // only unlock the first matching locked card
+      }
+
+      console.log(`No locked ${vehicleName} card found`);
+    }
+
+    // ----------------------------
+    // Wiring
+    // ----------------------------
+    $('#tts-toggle').addEventListener('change', function () {
+      ttsEnabled = this.checked;
+    });
+
+    $('#voice-toggle').addEventListener('change', function () {
+      voiceEnabled = this.checked;
+      toggleVoiceRecognition();
+    });
+
+    function openInfoModal() {
+      document.getElementById('info-modal').style.display = 'flex';
+    }
+
+    function closeInfoModal(e) {
+      if (!e || e.target.id === 'info-modal') {
+        document.getElementById('info-modal').style.display = 'none';
+      }
+    }
+
+    // ESC key support
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.getElementById('info-modal').style.display = 'none';
+      }
+    });
+  </script>
+
+</body>
+
+</html>
