@@ -913,6 +913,7 @@
           const timer = $('.timer', card);
           if (!timer || !isTimerInactive(timer)) continue;
           return card;
+          
         }
         return null;
       })();
@@ -924,7 +925,7 @@
 
       // Insert a new card in the same position, then remove the old one
       insertCardBeforeElement(oldCard, `./${toGroup.command}`, toGroup.name, oldCard.classList.contains('locked'));
-
+      
       // Remove old card (clears any interval)
       removeCard(oldCard.id);
       speak(`${fromGroup.name} replaced with ${toGroup.name}`);
@@ -996,6 +997,7 @@
 
       // speak(`${fromGroup.name} replaced with ${toGroup.name}`);
       console.log(`Replaced ${fromGroup.name} -> ${toGroup.name}`);
+      updateCardLabelsVisibility();
       return true;
     }
 
