@@ -1,3 +1,6 @@
-Timers to keep track of enemy air so you don't get backstabbed.
+Timers to keep track of enemy air.
 
-Comes with optional voice controls (only works on desktop).
+Features:
+Presets (maps & modes)
+Voice commands
+TTS callouts
