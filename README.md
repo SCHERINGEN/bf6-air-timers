@@ -1,5 +1,6 @@
 Timers to keep track of enemy air.
 
+Vibecoded, unoptimized, amateur code - that works good enough.
 
 Presets (maps & modes) - limited to Conquest and Escalation for now
 
