@@ -1,0 +1,118 @@
+{
+  "maps": [
+    { "id": "blackwell", "label": "Blackwell Fields" },
+    { "id": "contaminated", "label": "Contaminated" },
+    { "id": "eastwood", "label": "Eastwood" },
+    { "id": "liberation", "label": "Liberation Peak" },
+    { "id": "manhattan", "label": "Manhattan Bridge" },
+    { "id": "mirak", "label": "Mirak Valley" },
+    { "id": "newsobek", "label": "New Sobek City" },
+    { "id": "firestorm", "label": "Operation Firestorm" }
+  ],
+  "modes": [
+    { "id": "conquest", "label": "Conquest" },
+    { "id": "escalation", "label": "Escalation" }
+  ],
+  "presets": {
+    "blackwell": {
+      "conquest": [
+        { "vehicleId": "attack", "unlocked": true },
+        { "vehicleId": "bomber", "unlocked": true },
+        { "vehicleId": "stealth", "unlocked": true }
+      ],
+      "escalation": []
+    },
+    "contaminated": {
+      "conquest": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "attack", "unlocked": true }
+      ],
+      "escalation": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "attack", "unlocked": false },
+        { "vehicleId": "littlebird", "unlocked": false }
+      ]
+    },
+    "eastwood": {
+      "conquest": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "transport", "unlocked": true }
+      ],
+      "escalation": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "transport", "unlocked": false },
+        { "vehicleId": "attack", "unlocked": false }
+      ]
+    },
+    "firestorm": {
+      "conquest": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "attack", "unlocked": true },
+        { "vehicleId": "transport", "unlocked": true },
+        { "vehicleId": "bomber", "unlocked": true },
+        { "vehicleId": "stealth", "unlocked": true }
+      ],
+      "escalation": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "transport", "unlocked": true },
+        { "vehicleId": "attack", "unlocked": false },
+        { "vehicleId": "attack", "unlocked": false },
+        { "vehicleId": "bomber", "unlocked": false },
+        { "vehicleId": "stealth", "unlocked": false },
+        { "vehicleId": "bomber", "unlocked": false },
+        { "vehicleId": "stealth", "unlocked": false }
+      ]
+    },
+    "liberation": {
+      "conquest": [
+        { "vehicleId": "attack", "unlocked": true },
+        { "vehicleId": "bomber", "unlocked": true },
+        { "vehicleId": "stealth", "unlocked": true }
+      ],
+      "escalation": [
+        { "vehicleId": "attack", "unlocked": false },
+        { "vehicleId": "bomber", "unlocked": false },
+        { "vehicleId": "stealth", "unlocked": false }
+      ]
+    },
+    "manhattan": {
+      "conquest": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "attack", "unlocked": true }
+      ],
+      "escalation": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "attack", "unlocked": false }
+      ]
+    },
+    "mirak": {
+      "conquest": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "attack", "unlocked": true },
+        { "vehicleId": "bomber", "unlocked": true },
+        { "vehicleId": "stealth", "unlocked": true }
+      ],
+      "escalation": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "transport", "unlocked": true },
+        { "vehicleId": "attack", "unlocked": false },
+        { "vehicleId": "bomber", "unlocked": false },
+        { "vehicleId": "stealth", "unlocked": false },
+        { "vehicleId": "transport", "unlocked": false },
+        { "vehicleId": "bomber", "unlocked": false },
+        { "vehicleId": "stealth", "unlocked": false },
+        { "vehicleId": "attack", "unlocked": false }
+      ]
+    },
+    "newsobek": {
+      "conquest": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "transport", "unlocked": true }
+      ],
+      "escalation": [
+        { "vehicleId": "littlebird", "unlocked": true },
+        { "vehicleId": "transport", "unlocked": false }
+      ]
+    }
+  }
+}

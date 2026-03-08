@@ -1,0 +1,37 @@
+[
+  {
+    "id": "littlebird",
+    "name": "Scout",
+    "label": "Scout Helicopter",
+    "image": "images/littlebird.webp",
+    "aliases": ["scout", "count", "scalp", "scale", "gout"]
+  },
+  {
+    "id": "attack",
+    "name": "Attack",
+    "label": "Attack Helicopter",
+    "image": "images/attack.webp",
+    "aliases": ["attack", "talk", "tech"]
+  },
+  {
+    "id": "transport",
+    "name": "Transport",
+    "label": "Transport Helicopter",
+    "image": "images/transport.webp",
+    "aliases": ["trans", "port", "spot"]
+  },
+  {
+    "id": "bomber",
+    "name": "Bomber",
+    "label": "Bomber Jet",
+    "image": "images/bomber.webp",
+    "aliases": ["bomb", "pump", "bumper"]
+  },
+  {
+    "id": "stealth",
+    "name": "Stealth",
+    "label": "Stealth Jet",
+    "image": "images/stealth.webp",
+    "aliases": ["stealth", "stop", "self", "stove", "estelle", "status"]
+  }
+]

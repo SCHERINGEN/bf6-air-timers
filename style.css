@@ -1,0 +1,424 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+  background: #201e1e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.controls {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.toggles {
+  display: flex;
+  width: auto;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.add-btn,
+.clear-btn {
+  padding: 1rem 2rem;
+  height: 64px;
+  border: none;
+  border-radius: 8px;
+  background: #393b3f;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.clear-btn {
+  background: none;
+}
+
+.tts-toggle,
+.voice-toggle {
+  position: relative;
+  display: inline-block;
+  width: 74px;
+  height: 36px;
+}
+
+.tts-toggle input,
+.voice-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.tts-slider,
+.voice-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #393b3f;
+  transition: 0.3s;
+  border-radius: 18px;
+}
+
+.tts-slider:before,
+.voice-slider:before {
+  position: absolute;
+  content: "";
+  height: 28px;
+  width: 28px;
+  left: 4px;
+  bottom: 4px;
+  background: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.tts-toggle input:checked + .tts-slider {
+  background: #22c55e;
+}
+
+.voice-toggle input:checked + .voice-slider {
+  background: #3b82f6;
+}
+
+.tts-toggle input:checked + .tts-slider:before,
+.voice-toggle input:checked + .voice-slider:before {
+  transform: translateX(38px);
+}
+
+.tts-toggle-label,
+.voice-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cards {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.card {
+  max-width: 640px;
+  height: 360px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  position: relative;
+  flex: 1 1 calc(25%);
+}
+
+.card-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.card-image-container.dead::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-holder {
+  position: absolute;
+  top: 0;
+  left: -24px;
+  z-index: 9;
+  pointer-events: none;
+  padding: 4px 32px 8px 32px;
+  backdrop-filter: blur(5px) saturate(100%);
+  -webkit-backdrop-filter: blur(5px) saturate(100%);
+  mask-image: radial-gradient(circle, black 70%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle, black 70%, transparent 100%);
+}
+
+.card-label {
+  color: white;
+  font-weight: 400;
+  font-size: 1rem;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+  font-style: italic;
+}
+
+.card-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+}
+
+.action-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #393b3f;
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.action-btn.delete:hover {
+  background: #dc2626;
+}
+
+.action-btn.replace:hover {
+  background: #2563eb;
+}
+
+.action-btn.lock:hover {
+  background: #1f7a1f;
+}
+
+.replace-select {
+  position: absolute;
+  top: 64px;
+  right: 64px;
+  z-index: 11;
+  background: #393b3f;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 16px;
+  display: none;
+  outline: none;
+  min-width: 180px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23FFFFFF' viewBox='0 0 20 20'><path d='M7 10l5 5 5-5z'/><path fill='none' d='M0 0h24v24H0z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 20px;
+  padding-right: 24px;
+}
+
+.replace-select option {
+  background: #201e1e;
+  color: white;
+}
+
+.kill-btn {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  height: 64px;
+  border: none;
+  background: #393b3f;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  z-index: 5;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.kill-btn:hover {
+  background: #550000;
+}
+
+.timer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  color: white;
+  text-shadow: 1px 0 10px black;
+  z-index: 5;
+  display: none;
+  font-size: clamp(1rem, 6vw, 6rem);
+}
+
+.timer.warning {
+  color: #eab308;
+}
+
+.timer.danger {
+  color: #dc2626;
+}
+
+.timer-controls {
+  position: absolute;
+  top: calc(50% + 5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 1.5rem;
+  z-index: 6;
+  display: none;
+}
+
+.time-btn {
+  min-width: 72px;
+  min-height: 56px;
+  padding: 0.6rem 1rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  background: #393b3f;
+  color: white;
+  cursor: pointer;
+}
+
+.time-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.selectField {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 20px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%23FFFFFF' viewBox='0 0 20 20'><path d='M7 10l5 5 5-5z'/><path fill='none' d='M0 0h24v24H0z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 20px;
+  padding-right: 60px;
+}
+
+@keyframes pulseTwice {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.04); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.card.pulse {
+  animation: pulseTwice 0.6s ease-in-out;
+}
+
+.card.locked .card-image-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2;
+}
+
+.card.locked .kill-btn {
+  background: #393b3f;
+  cursor: pointer;
+}
+
+.card.locked .kill-btn:hover {
+  background: #1f7a1f;
+}
+
+.card.locked .action-btn.lock {
+  display: none;
+}
+
+.info-btn {
+  height: 64px;
+  width: 64px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.info-btn:hover {
+  background: #4b5563;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  position: relative;
+  background: rgba(32, 30, 30, 0.85);
+  backdrop-filter: blur(10px) saturate(120%);
+  color: white;
+  border-radius: 12px;
+  max-width: 520px;
+  width: 90%;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.modal-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.modal-content ul {
+  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+  padding-left: 1.25rem;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: #dc2626;
+}
+
+.hidden {
+  display: none !important;
+}
